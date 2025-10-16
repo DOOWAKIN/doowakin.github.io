@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>段丁允 · 个人主页</title>
+<style>
+  /* -------------------------
+     主题变量（浅色为主，多蓝色）
+     深色模式通过 body.dark 切换
+     ------------------------- */
+  :root{
+    --bg: linear-gradient(180deg,#f7fbff 0%, #eaf6ff 100%);
+    --surface: rgba(255,255,255,0.5);
+    --card-bg: rgba(255,255,255,0.55);
+    --text: #0f1720;
+    --muted: #4b5563;
+    --accent-grad: linear-gradient(90deg,#4da3ff 0%, #9fd1ff 50%, #cfe9ff 100%);
+    --accent: #4da3ff;
+    --glass-border: rgba(255,255,255,0.5);
+    --shadow: 0 10px 30px rgba(12,20,30,0.08);
+    --shadow-strong: 0 18px 50px rgba(12,20,30,0.12);
+    --card-glow: rgba(77,163,255,0.12);
+    --ease: cubic-bezier(0.4,0,0.2,1);
+    --word-alpha: 1;
+  }
+
+  body.dark{
+    --bg: linear-gradient(180deg,#0f1720 0%, #0b1220 100%);
+    --surface: rgba(20,24,30,0.55);
+    --card-bg: rgba(24,28,36,0.6);
+    --text: #e6eef9;
+    --muted: #b3b9c6;
+    --accent-grad: linear-gradient(90deg,#4f7efc 0%, #7f6bf5 50%, #60d8b7 100%);
+    --accent: #4f7efc;
+    --glass-border: rgba(255,255,255,0.06);
+    --shadow: 0 8px 30px rgba(0,0,0,0.6);
+    --shadow-strong: 0 18px 60px rgba(0,0,0,0.7);
+    --card-glow: rgba(80,110,255,0.06);
+    --ease: cubic-bezier(0.4,0,0.2,1);
+    --word-alpha: 0.92;
+  }
+
+  /* --------------- 基础样式 --------------- */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    transition: background 0.6s var(--ease), color 0.6s var(--ease);
+    scroll-behavior:smooth;
+  }
+
+  a{color:inherit;text-decoration:none}
+  .container{max-width:1200px;margin:0 auto;padding:0 24px}
+
+  /* --------------- 顶部导航（悬浮） --------------- */
+  header {
+    position:fixed; left:0; right:0; top:16px;
+    margin:0 auto; z-index:1200;
+    display:flex; justify-content:center;
+    pointer-events:auto;
+  }
+  .nav-wrap{
+    width: calc(100% - 48px);
+    max-width:1100px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 18px;
+    border-radius:14px;
+    background: var(--surface);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    border:1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.4s var(--ease), transform 0.4s var(--ease), background 0.6s var(--ease);
+  }
+
+  /* 流光高光条（在滚动或悬停时激活） */
+  .nav-glow::after{
+    content:"";
+    position:absolute;
+    left:-40%;
+    top:0;
+    height:3px;
+    width:180%;
+    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.6), rgba(77,163,255,0.8), rgba(255,255,255,0.0));
+    background-size:200% 100%;
+    transform:translateX(-30%);
+    filter:blur(8px) saturate(140%);
+    opacity:0; transition:opacity 0.4s var(--ease);
+    animation: flow 6s linear infinite;
+    border-radius:8px;
+    pointer-events:none;
+  }
+  @keyframes flow{
+    0%{background-position:200% 0}
+    100%{background-position:-200% 0}
+  }
+
+  /* 当滚动一定高度或鼠标悬停使流光可见 */
+  .nav-active .nav-glow::after { opacity:1 }
+
+  .brand { display:flex; align-items:center; gap:12px; }
+  .brand .logo {
+    width:42px;height:42px;border-radius:10px;
+    background: linear-gradient(180deg,#ffffff, #e6f4ff);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow: 0 6px 18px rgba(77,163,255,0.12);
+    transition:transform .3s var(--ease);
+  }
+  .brand .logo svg{ width:22px; height:22px; fill:var(--accent) }
+
+  nav.primary { display:flex; gap:18px; align-items:center }
+  nav.primary a {
+    padding:8px 6px; border-radius:8px; font-weight:600; color:var(--text);
+    transition: color .25s var(--ease), background .25s var(--ease), transform .25s var(--ease);
+  }
+  nav.primary a:hover { color:var(--accent); transform:translateY(-2px) }
+
+  /* --------------- 右下悬浮按钮（主题 & 回到顶部）--------------- */
+  .floating {
+    position:fixed; right:28px; bottom:28px; z-index:1300;
+    display:flex; flex-direction:column; gap:12px; align-items:center;
+  }
+  .btn-circle{
+    width:54px;height:54px;border-radius:999px;border:none;
+    background:var(--card-bg); backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    box-shadow: var(--shadow-strong);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer; transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .4s var(--ease);
+    border:1px solid var(--glass-border);
+  }
+  .btn-circle:active{ transform:scale(.98) }
+  .btn-circle svg{ width:22px;height:22px; color:var(--text); fill: currentColor; stroke:currentColor; transition: color .3s var(--ease), transform .4s var(--ease) }
+
+  /* top button initially hidden */
+  #topBtn{ opacity:0; transform:translateY(10px); pointer-events:none }
+  #topBtn.visible{ opacity:1; transform:translateY(0); pointer-events:auto }
+
+  /* --------------- 页面区块基类（淡入） --------------- */
+  section {
+    padding:96px 0;
+    min-height:60vh;
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity .6s var(--ease), transform .6s var(--ease);
+  }
+  .section-inner{ width:100%; max-width:1200px; padding:0 24px; margin:0 auto; }
+
+  .fade-up { opacity:0; transform:translateY(18px); transition: opacity .9s var(--ease), transform .9s var(--ease) }
+  .fade-up.in { opacity:1; transform:translateY(0) }
+
+  /* --------------- Hero --------------- */
+  .hero {
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    gap:18px; padding-top:20vh; padding-bottom:20vh;
+  }
+
+  .hero-title {
+    font-size: clamp(3.2rem, 7vw, 6rem);
+    font-weight:800;
+    line-height:0.95;
+    letter-spacing:-0.02em;
+    position:relative;
+    display:inline-block;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    background-image: var(--accent-grad);
+    background-size:200% 100%;
+    transition: transform .5s var(--ease), filter .5s var(--ease);
+  }
+  /* 流光 hover（柔和） */
+  .hero-title::after{
+    content:"";
+    position:absolute; inset:0;
+    background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.35), rgba(255,255,255,0.08));
+    mix-blend-mode: overlay;
+    transform: translateX(-120%);
+    transition: transform .9s var(--ease);
+    pointer-events:none;
+  }
+  .hero-title:hover{ transform:scale(1.04) }
+  .hero-title:hover::after{ transform: translateX(120%) }
+
+  .hero-sub { color:var(--muted); font-size:1.05rem; max-width:780px; margin-top:6px }
+
+  /* --------------- 自我介绍（毛玻璃卡片） --------------- */
+  .about-card{
+    display:flex; gap:28px; align-items:center; padding:28px;
+    background:var(--card-bg); border-radius:18px; border:1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px) saturate(130%); -webkit-backdrop-filter: blur(18px) saturate(130%);
+    transition: box-shadow .4s var(--ease), transform .4s var(--ease), background .5s var(--ease);
+  }
+  .about-left{ width:160px; display:flex; flex-direction:column; align-items:center; gap:12px }
+  .avatar{
+    width:120px;height:120px;border-radius:999px; overflow:hidden;
+    box-shadow: 0 10px 30px rgba(77,163,255,0.12);
+    border:4px solid rgba(255,255,255,0.6);
+    transition: box-shadow .4s var(--ease), transform .4s var(--ease);
+  }
+  body.dark .avatar{ box-shadow: 0 10px 30px rgba(0,0,0,0.6); border:3px solid rgba(255,255,255,0.03) }
+
+  .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+  .about-right{ flex:1 }
+  .about-right h2{ margin:0; font-size:1.6rem; color:var(--text) }
+  .about-right p{ margin-top:10px; color:var(--muted); line-height:1.7; max-width:720px }
+
+  .socials { margin-top:14px; display:flex; gap:12px }
+  .socials a{ display:inline-flex; align-items:center; justify-content:center; width:44px;height:44px;border-radius:10px;
+    background:transparent; border:1px solid var(--glass-border); color:var(--text); transition:background .25s var(--ease), transform .25s var(--ease) }
+  .socials a:hover{ transform:translateY(-4px); background:linear-gradient(180deg, rgba(255,255,255,0.15), rgba(255,255,255,0.06)) }
+
+  /* --------------- 项目卡片区（多个卡片） --------------- */
+  .cards-grid{ display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:20px; width:100% }
+  .project-card{
+    border-radius:16px; padding:18px; background:var(--card-bg);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: var(--shadow);
+    transition: transform .36s var(--ease), box-shadow .36s var(--ease), border-color .36s var(--ease);
+    position:relative; overflow:hidden;
+  }
+  .project-card:hover{
+    transform:translateY(-10px);
+    box-shadow: var(--shadow-strong);
+    border-color: rgba(77,163,255,0.25);
+  }
+  .project-card::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background: linear-gradient(120deg, transparent 0%, var(--card-glow) 35%, transparent 70%);
+    opacity:0; transition:opacity .45s var(--ease), transform .45s var(--ease);
+    transform: translateY(20px);
+  }
+  .project-card:hover::after{ opacity:1; transform:translateY(0) }
+
+  .project-img{ width:100%; height:140px; border-radius:12px; object-fit:cover; display:block; margin-bottom:12px }
+  .project-title{ font-weight:700; margin-bottom:6px }
+  .project-desc{ color:var(--muted); font-size:.95rem }
+
+  /* --------------- 词云区 --------------- */
+  .word-cloud{
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:12px;
+    padding:18px; border-radius:16px; background:var(--card-bg); border:1px solid var(--glass-border);
+    backdrop-filter:blur(12px) saturate(130%);
+  }
+  .word-cloud .word{
+    font-weight:700; cursor:default;
+    transition: transform .28s var(--ease), opacity .28s var(--ease), filter .28s var(--ease);
+    opacity: var(--word-alpha);
+  }
+
+  /* 彩色词云样式（浅色 & 深色适配） */
+  .w-blue{ color:#3b82f6 }
+  .w-teal{ color:#06b6d4 }
+  .w-green{ color:#10b981 }
+  .w-purple{ color:#8b5cf6 }
+  .w-pink{ color:#fb7185 }
+  .w-amber{ color:#f59e0b }
+  .w-indigo{ color:#6366f1 }
+  body.dark .w-blue{ filter:brightness(1.1) saturate(1.05) }
+  body.dark .w-pink{ filter:brightness(0.95) saturate(0.95) }
+
+  .word-cloud .word:hover{ transform:scale(1.18) }
+
+  /* --------------- Footer --------------- */
+  footer{ padding:36px 0; text-align:center; color:var(--muted); border-top:1px solid rgba(0,0,0,0.04); margin-top:40px }
+  body.dark footer{ border-top-color: rgba(255,255,255,0.03) }
+
+  /* --------------- 响应式 --------------- */
+  @media (max-width:880px){
+    .nav-wrap{ width: calc(100% - 32px); padding:8px 12px }
+    .about-card{ flex-direction:column; align-items:center; text-align:center; gap:18px }
+    .about-left{ width:100% }
+    .about-right{ width:100% }
+    .hero { padding-top:14vh; padding-bottom:14vh }
+  }
+
+  /* --------------- 小细节优雅缓动统一 --------------- */
+  .animate-ease{ transition: all .45s var(--ease) }
+</style>
+</head>
+<body>
+  <!-- NAV -->
+  <header id="siteHeader">
+    <div class="nav-wrap nav-glow container" id="navWrap" role="navigation" aria-label="主导航">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <!-- 简洁 logo（蓝色图形） -->
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="4" fill="url(#g)"></rect>
+            <defs>
+              <linearGradient id="g" x1="0" x2="1">
+                <stop offset="0" stop-color="#a8d2ff"/>
+                <stop offset="1" stop-color="#4da3ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="site-name" style="font-weight:700">段丁允</div>
+      </div>
+
+      <nav class="primary" aria-label="主要链接">
+        <a href="#home">首页</a>
+        <a href="#about">关于</a>
+        <a href="#projects">项目</a>
+        <a href="#skills">技能</a>
+        <a href="#contact">联系方式</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main id="main">
+    <section id="home" class="hero">
+      <div class="section-inner">
+        <h1 class="hero-title" id="heroTitle" title="段丁允">段丁允</h1>
+        <p class="hero-sub">设计和代码把复杂变简单。</p>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="fade-up">
+      <div class="section-inner">
+        <div class="about-card animate-ease">
+          <div class="about-left">
+            <div class="avatar" aria-hidden="true">
+              <!-- 可替换为你的头像链接 -->
+              <img src="https://picsum.photos/seed/duan/400" alt="段丁允 头像">
+            </div>
+            <div style="font-size:.95rem;color:var(--muted)">网页的数据呈现</div>
+          </div>
+          <div class="about-right">
+            <h2>你好，我是段丁允</h2>
+            <p>来自浙江省宁波市镇海区尚志中学的一名初中信息科技教师。</p>
+            <div class="socials" aria-label="社交链接">
+              <a href="https://github.com/" target="_blank" aria-label="GitHub" title="GitHub">
+                <!-- GitHub SVG 使用 currentColor -->
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 .297a12 12 0 00-3.797 23.4c.6.111.82-.258.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416a3.176 3.176 0 00-1.334-1.758c-1.09-.746.083-.73.083-.73a2.515 2.515 0 011.834 1.234 2.548 2.548 0 003.487 1 2.549 2.549 0 01.761-1.604c-2.665-.305-5.467-1.333-5.467-5.931a4.654 4.654 0 011.239-3.226 4.32 4.32 0 01.118-3.182s1.005-.322 3.293 1.233a11.385 11.385 0 015.994 0c2.288-1.555 3.293-1.233 3.293-1.233a4.32 4.32 0 01.118 3.182 4.654 4.654 0 011.239 3.226c0 4.61-2.807 5.624-5.479 5.921a2.86 2.86 0 01.816 2.218v3.293c0 .319.22.694.826.576A12 12 0 0012 .297"/>
+                </svg>
+              </a>
+              <a href="mailto:example@email.com" aria-label="邮箱" title="邮箱">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                  <path d="M3 7l9 6 9-6"></path>
+                </svg>
+              </a>
+              <a href="https://www.linkedin.com/" target="_blank" aria-label="LinkedIn" title="LinkedIn">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M4.98 3.5c0 1.38-1.12 2.5-2.5 2.5S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.4 8h4.76V24H.4zM8.9 8h4.56v2.2h.06c.64-1.2 2.2-2.48 4.52-2.48 4.84 0 5.74 3.18 5.74 7.32V24H19V15.2c0-2.1-.04-4.8-2.92-4.8-2.92 0-3.36 2.28-3.36 4.64V24H8.9z"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="fade-up">
+      <div class="section-inner">
+        <h3 style="margin:0 0 18px 0; font-size:1.4rem; font-weight:800; color:var(--accent)">项目与作品</h3>
+        <p style="margin:0 0 22px 0; color:var(--muted)">以下为近期部分作品示例</p>
+        <div class="cards-grid">
+          <article class="project-card">
+            <img class="project-img" src="https://picsum.photos/seed/p1/800/450" alt="项目1">
+            <div class="project-title">AI 教学可视化</div>
+            <div class="project-desc">交互式可视化教学，适配课堂演示与学生实验。</div>
+          </article>
+
+          <article class="project-card">
+            <img class="project-img" src="https://picsum.photos/seed/p2/800/450" alt="项目2">
+            <div class="project-title">数据可视化仪表盘</div>
+            <div class="project-desc">用于展示学生学习行为与成绩分布的可视化面板。</div>
+          </article>
+
+          <article class="project-card">
+            <img class="project-img" src="https://picsum.photos/seed/p3/800/450" alt="项目3">
+            <div class="project-title">互动教学小游戏</div>
+            <div class="project-desc">教学小游戏框架，用于课堂互动与逻辑训练。</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS / WORD CLOUD -->
+    <section id="skills" class="fade-up">
+      <div class="section-inner">
+        <h3 style="margin:0 0 16px 0; font-size:1.4rem; font-weight:800; color:var(--accent)">技能与关键词</h3>
+        <p style="margin:0 0 16px 0; color:var(--muted)">信息科技</p>
+
+        <div class="word-cloud" role="list" aria-label="技能词云" style="margin-top:12px">
+          <!-- 字体大小和颜色可按需微调 -->
+          <span class="word w-blue" style="font-size:2.1rem">Python</span>
+          <span class="word w-indigo" style="font-size:1.7rem">可视化</span>
+          <span class="word w-teal" style="font-size:1.6rem">Machine Learning</span>
+          <span class="word w-green" style="font-size:1.4rem">教育信息化</span>
+          <span class="word w-purple" style="font-size:1.5rem">UI</span>
+          <span class="word w-pink" style="font-size:1.2rem">C++</span>
+          <span class="word w-amber" style="font-size:1.3rem">Matplotlib</span>
+          <span class="word w-blue" style="font-size:1.5rem">C</span>
+          <span class="word w-teal" style="font-size:1.2rem">交互设计</span>
+          <span class="word w-indigo" style="font-size:1.3rem">Pandas</span>
+          <span class="word w-green" style="font-size:1.6rem">前端设计</span>
+          <span class="word w-amber" style="font-size:1.4rem">教学实验</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT / FOOTER -->
+    <section id="contact" class="fade-up" style="padding-bottom:40px">
+      <div class="section-inner" style="text-align:center">
+        <h3 style="margin-bottom:12px; font-weight:800; color:var(--accent)">联系方式</h3>
+        <p style="color:var(--muted)">欢迎联系交流</p>
+        <div style="margin-top:18px">
+          <a href="mailto:example@email.com" class="btn-circle" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+              <path d="M3 7l9 6 9-6"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container" style="padding:20px 24px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap">
+      <div style="color:var(--muted)">&copy; <span id="year"></span> 段丁允 </div>
+      <div style="color:var(--muted)">网页的数据呈现</div>
+    </div>
+  </footer>
+
+  <!-- 浮动按钮（主题切换 + 回顶部） -->
+  <div class="floating" aria-hidden="false">
+    <button id="themeBtn" class="btn-circle" aria-label="切换深浅色主题" title="切换主题">
+      <!-- 图标使用 currentColor，颜色由 CSS 变量控制 -->
+      <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
+        <!-- 默认日夜混合形态，JS 会按主题替换 path -->
+        <path d="M12 3v1m0 16v1m8.485-8.485h1M3.515 12.515h1m12.02-7.02l.707.707M6.758 17.243l.707.707m0-12.728l-.707.707m12.728 12.728l-.707.707M12 5a7 7 0 100 14 7 7 0 000-14z" fill="currentColor"/>
+      </svg>
+    </button>
+
+    <button id="topBtn" class="btn-circle" aria-label="返回顶部" title="返回顶部">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 4l-8 8h6v8h4v-8h6z" fill="currentColor"></path>
+      </svg>
+    </button>
+  </div>
+
+<script>
+  /* =========== 脚本：主题切换、滚动交互、淡入动画 =========== */
+
+  // 年份
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // 元素
+  const body = document.documentElement;
+  const header = document.getElementById('siteHeader');
+  const navWrap = document.getElementById('navWrap');
+  const topBtn = document.getElementById('topBtn');
+  const themeBtn = document.getElementById('themeBtn');
+  const themeIcon = document.getElementById('themeIcon');
+
+  // 主题控制：优先本地存储，其次系统偏好
+  function applyTheme(isDark){
+    if(isDark){
+      document.body.classList.add('dark');
+      body.classList.add('dark');
+      // 切换 icon -> moon
+      themeIcon.innerHTML = '<path d="M21.64 13a9 9 0 11-10.64-10.64 7 7 0 1010.64 10.64z" fill="currentColor"/>';
+    } else {
+      document.body.classList.remove('dark');
+      body.classList.remove('dark');
+      // 切换 icon -> sun
+      themeIcon.innerHTML = '<path d="M12 3v2m0 14v2m9-9h-2M5 12H3m12.364-7.364l-1.414 1.414M7.05 16.95l-1.414 1.414m12.728 0l-1.414-1.414M7.05 7.05L5.636 5.636M12 7a5 5 0 100 10 5 5 0 000-10z" fill="currentColor"/>';
+    }
+    localStorage.setItem('theme-dark', isDark ? '1' : '0');
+  }
+
+  // 初始化主题
+  const stored = localStorage.getItem('theme-dark');
+  if(stored !== null){
+    applyTheme(stored === '1');
+  } else {
+    const prefers = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(prefers);
+  }
+
+  themeBtn.addEventListener('click', () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    applyTheme(!isDark);
+  });
+
+  // 滚动时：导航高光显示 / 回到顶部按钮显示
+  let lastScroll = 0;
+  window.addEventListener('scroll', ()=> {
+    const y = window.scrollY || window.pageYOffset;
+    // 导航变强（滚动或靠近顶部时）
+    if(y > 40){
+      navWrap.classList.add('nav-active');
+      header.classList.add('nav-active');
+    } else {
+      navWrap.classList.remove('nav-active');
+      header.classList.remove('nav-active');
+    }
+    // top button show/hide
+    if(y > 300){
+      topBtn.classList.add('visible');
+    } else {
+      topBtn.classList.remove('visible');
+    }
+    lastScroll = y;
+  });
+
+  // 返回顶部
+  topBtn.addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smooth'}));
+
+  // 视差/淡入：用 IntersectionObserver 让每个 .fade-up 元素淡入
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, {threshold:0.12});
+
+  document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+
+  // 其他：Hero 标题鼠标流光效果已由 CSS 完成
+
+  /* 小优化：点击导航后在移动端收起可能的菜单（若你扩展为折叠菜单时有用） */
+  document.querySelectorAll('nav.primary a').forEach(a=>{
+    a.addEventListener('click', ()=>{
+      // 可在这里关闭移动菜单
+    });
+  });
+
+  // 无障碍：键盘访问主题按钮
+  themeBtn.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      themeBtn.click();
+    }
+  });
+
+  // 初始触发一次滚动逻辑（确保正确状态）
+  window.dispatchEvent(new Event('scroll'));
+</script>
+</body>
+</html>
